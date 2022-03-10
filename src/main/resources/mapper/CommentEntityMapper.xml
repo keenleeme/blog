@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monster.blog.mapper.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.monster.blog.domain.CommentEntity">
+        <id column="ID" property="id"/>
+        <result column="BLOG_ID" property="blogId"/>
+        <result column="NICK_NAME" property="nickName"/>
+        <result column="CONTENT" property="content"/>
+        <result column="VARTAR" property="avatar"/>
+        <result column="PARENT_COMMENT_ID" property="parentCommentId"/>
+        <result column="PARENT_NICK_NAME" property="parentNickName"/>
+        <result column="PARENT_USER_ID" property="parentUserId"/>
+        <result column="PARENT_AVATAR" property="parentAvatar"/>
+        <result column="ADMIN_COMMENT" property="adminComment"/>
+        <result column="IS_REMOVED" property="isRemoved"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="CREATED_BY" property="createdBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, BLOG_ID, NICK_NAME, CONTENT, AVATAR, PARENT_COMMENT_ID, PARENT_NICK_NAME, PARENT_USER_ID, PARENT_AVATAR, ADMIN_COMMENT, IS_REMOVED, CREATED_TIME, CREATED_BY
+    </sql>
+
+</mapper>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monster.blog.mapper.BlogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.monster.blog.domain.BlogEntity">
+        <id column="ID" property="id"/>
+        <result column="TYPE_ID" property="typeId"/>
+        <result column="TAG_IDS" property="tagIds"/>
+        <result column="TITLE" property="title"/>
+        <result column="CONTENT" property="content"/>
+        <result column="BANNER_IMG" property="bannerImg"/>
+        <result column="DESCS" property="descs"/>
+        <result column="SHARE_STATEMENT" property="shareStatement"/>
+        <result column="IS_ORIGINAL" property="isOriginal"/>
+        <result column="STATUS" property="status"/>
+        <result column="IS_RECOMMEND" property="isRecommend"/>
+        <result column="IS_PRIVACY" property="isPrivacy"/>
+        <result column="IS_COMMENTABLE" property="isCommentable"/>
+        <result column="IS_LIKE" property="isLike"/>
+        <result column="READ_NUMS" property="readNums"/>
+        <result column="COMMENT_NUMS" property="commentNums"/>
+        <result column="LIKE_NUMS" property="likeNums"/>
+        <result column="IS_REMOVED" property="isRemoved"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+        <result column="UPDATED_BY" property="updatedBy"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, TYPE_ID, TAG_IDS, TITLE, CONTENT, BANNER_IMG, DESCS, SHARE_STATEMENT, IS_ORIGINAL, STATUS,IS_RECOMMEND, IS_PRIVACY, IS_COMMENTABLE, IS_LIKE, READ_NUMS, COMMENT_NUMS, LIKE_NUMS, IS_REMOVED, CREATED_TIME, CREATED_BY, UPDATED_TIME, UPDATED_BY
+    </sql>
+
+    <select id="selectBlogStatistic" resultType="com.monster.blog.vo.BlogStatisticVo">
+        SELECT
+        COUNT(ID) totalBlogNums,
+        IFNULL(SUM(READ_NUMS),0) totalReadNums,
+        IFNULL(SUM(COMMENT_NUMS),0) totalCommentNums,
+        IFNULL(SUM(LIKE_NUMS),0) totalLikeNums
+        FROM blog
+        WHERE IS_REMOVED = 0
+        AND `STATUS` = 2
+        <if test="userId != null">
+            AND CREATED_BY = #{userId}
+        </if>
+    </select>
+
+    <insert id="insertBlog" parameterType="com.monster.blog.domain.BlogEntity">
+        INSERT INTO blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            TYPE_ID, TAG_IDS, TITLE, CONTENT, BANNER_IMG,
+            `DESCS`, SHARE_STATEMENT, IS_ORIGINAL, STATUS,IS_RECOMMEND,
+            IS_PRIVACY, IS_COMMENTABLE, IS_LIKE, READ_NUMS, COMMENT_NUMS, LIKE_NUMS,
+            IS_REMOVED, CREATED_TIME, CREATED_BY, UPDATED_TIME, UPDATED_BY
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{typeId},#{tagIds},#{title},#{content},#{bannerImg},
+            #{descs},#{shareStatement},#{isOriginal},#{status},#{isRecommend},
+            #{isPrivacy},#{isCommentable},#{isLike},0,0,0,
+            0,#{createdTime},#{createdBy},#{updatedTime},#{updatedBy}
+        </trim>
+    </insert>
+
+    <select id="selectBlogList" parameterType="com.monster.blog.query.BlogQuery"
+            resultType="com.monster.blog.vo.BlogVo">
+        SELECT
+        b.ID id,
+        b.TITLE title,
+        t.NAME typeName,
+        b.TAG_IDS tagIds,
+        b.IS_ORIGINAL isOriginal,
+        b.IS_RECOMMEND isRecommend,
+        b.IS_PRIVACY isPrivacy,
+        b.STATUS status,
+        b.READ_NUMS readNums,
+        b.COMMENT_NUMS commentNums,
+        b.LIKE_NUMS likeNums,
+        DATE_FORMAT(b.CREATED_TIME,'%Y-%m-%d %H:%i') updatedTime
+        FROM blog b
+        LEFT JOIN type t
+        ON b.TYPE_ID = t.ID
+        WHERE b.IS_REMOVED = 0
+        <if test="title != null and title != ''">
+            AND b.TITLE LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="tagIdList != null and tagIdList != ''">
+            AND
+            <foreach collection="tagIdList" open="(" separator="or" close=")" index="index" item="item">
+                b.TAG_IDS LIKE CONCAT('%', #{item}, '%')
+            </foreach>
+        </if>
+        <if test="typeId != null">
+            AND b.TYPE_ID = #{typeId}
+        </if>
+        <if test="userId != null">
+            AND b.CREATED_BY = #{userId}
+        </if>
+        ORDER BY b.CREATED_TIME DESC
+    </select>
+
+    <select id="selectRecommendList" resultType="com.monster.blog.vo.RecommendBlogVo">
+        SELECT
+        ID id,
+        TITLE title,
+        BANNER_IMG bannerImg
+        FROM blog
+        WHERE IS_REMOVED = 0
+        AND IS_RECOMMEND = 1
+        ORDER BY READ_NUMS,CREATED_TIME DESC
+        LIMIT 4
+    </select>
+
+    <select id="selectIndexBlogList" resultType="com.monster.blog.vo.IndexBlogVo">
+        SELECT
+        b.ID id,
+        b.TITLE title,
+        b.BANNER_IMG bannerImg,
+        b.DESCS descs,
+        b.READ_NUMS readNums,
+        b.COMMENT_NUMS commentNums,
+        b.LIKE_NUMS likeNums,
+        DATE_FORMAT(b.UPDATED_TIME,'%Y-%m-%d') updateTime,
+        t.NAME typeName,
+        u.USER_NAME userName,
+        u.AVATAR avatar
+        FROM blog b
+        LEFT JOIN type t
+        ON b.TYPE_ID = t.ID
+        LEFT JOIN `user` u
+        ON b.CREATED_BY = u.ID
+        WHERE b.IS_REMOVED = 0
+        AND t.IS_REMOVED = 0
+        AND b.STATUS = 2
+        ORDER BY READ_NUMS DESC
+    </select>
+
+    <select id="selectBlogByType" resultType="com.monster.blog.vo.IndexBlogVo">
+        SELECT
+        b.ID id,
+        b.TITLE title,
+        b.BANNER_IMG bannerImg,
+        b.DESCS descs,
+        b.READ_NUMS readNums,
+        b.COMMENT_NUMS commentNums,
+        b.LIKE_NUMS likeNums,
+        DATE_FORMAT(b.UPDATED_TIME,'%Y-%m-%d') updateTime,
+        t.NAME typeName,
+        u.USER_NAME userName,
+        u.AVATAR avatar
+        FROM blog b
+        LEFT JOIN type t
+        ON b.TYPE_ID = t.ID
+        LEFT JOIN `user` u
+        ON b.CREATED_BY = u.ID
+        WHERE b.IS_REMOVED = 0
+        AND t.IS_REMOVED = 0
+        AND b.STATUS = 2
+        AND b.TYPE_ID = #{typeId}
+        ORDER BY READ_NUMS DESC
+    </select>
+
+    <select id="selectBlogDetail" resultType="com.monster.blog.vo.BlogVo">
+        SELECT
+        b.ID id,
+        u.USER_NAME userName,
+        u.AVATAR avatar,
+        b.BANNER_IMG bannerImg,
+        b.TITLE title,
+        b.CONTENT content,
+        t.NAME typeName,
+        b.TAG_IDS tagIds,
+        b.IS_PRIVACY isPrivacy,
+        b.IS_COMMENTABLE isCommentable,
+        b.IS_LIKE isLike,
+        b.SHARE_STATEMENT shareStatement,
+        b.READ_NUMS readNums,
+        b.COMMENT_NUMS commentNums,
+        b.LIKE_NUMS likeNums,
+        DATE_FORMAT(b.CREATED_TIME,'%Y-%m-%d %H:%i') updatedTime
+        FROM blog b
+        LEFT JOIN type t
+        ON b.TYPE_ID = t.ID
+        LEFT JOIN user u
+        ON b.CREATED_BY = u.ID
+        WHERE b.IS_REMOVED = 0
+        AND b.ID = #{id}
+    </select>
+
+    <update id="updateNumsAboutBlog" parameterType="com.monster.blog.vo.UpdateNumsVo">
+        UPDATE blog
+        <set>
+            <if test="isRead">
+                READ_NUMS = READ_NUMS + 1,
+            </if>
+            <if test="isComment">
+                COMMENT_NUMS = COMMENT_NUMS + 1,
+            </if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
+    <update id="minusNumsAboutBlog" parameterType="com.monster.blog.vo.UpdateNumsVo">
+        UPDATE blog
+        <set>
+            <!--<if test="isRead">-->
+                <!--READ_NUMS = READ_NUMS - 1,-->
+            <!--</if>-->
+            <if test="isComment">
+                COMMENT_NUMS = COMMENT_NUMS - 1,
+            </if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monster.blog.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.monster.blog.domain.UserEntity">
+        <id column="ID" property="id" />
+        <result column="NICK_NAME" property="nickName" />
+        <result column="USER_NAME" property="userName" />
+        <result column="PASSWORD" property="password" />
+        <result column="SALT_VALUE" property="saltValue" />
+        <result column="ROLE_ID" property="roleId" />
+        <result column="PHONE_NUMBER" property="phoneNumber" />
+        <result column="EMAIL" property="email" />
+        <result column="AVATAR" property="avatar" />
+        <result column="IS_REMOVED" property="isRemoved" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="UPDATED_TIME" property="updatedTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, NICK_NAME, USER_NAME, PASSWORD, SALT_VALUE, ROLE_ID, PHONE_NUMBER, EMAIL, AVATAR, IS_REMOVED, CREATED_TIME, UPDATED_TIME
+    </sql>
+
+</mapper>

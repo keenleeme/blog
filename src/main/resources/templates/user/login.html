@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <link href="../static/images/favicon.ico" th:href="@{../static/images/me.jpg}" rel="icon" type="image/x-ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+    <link rel="stylesheet" href="../static/css/me.css" th:href="@{../static/css/me.css}">
+</head>
+<body>
+
+<br>
+<br>
+<br>
+<div class="m-container-small m-padded-tb-massive" style="max-width: 30em !important;">
+    <div class="ur container">
+        <div class="ui middle aligned center aligned grid">
+            <div class="column" style="margin-top: 50px">
+                <h2 class="ui teal image header">
+                    <div class="content">
+                        用户登录
+                    </div>
+                </h2>
+                <form class="ui large form" method="post" action="#" th:action="@{/user/login}">
+                    <div class="ui  segment">
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input id="userName" type="text" name="userName" placeholder="用户名" onchange="checkRepetitive()">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <input type="password" height="8px" name="password" placeholder="密码">
+                            </div>
+                        </div>
+                        <div class="ui icon a" style="font-size: 12px">
+                            <a style="cursor: pointer;margin-left: 0 !important;" class="ui arrow circle left icon">忘记密码</a>
+                            <a style="cursor: pointer;margin-left: 290px" href="/user/registerPage" class="ui arrow circle right icon">免费注册</a>
+                        </div>
+                        <button class="ui fluid large teal submit button" style="margin-top: 8px">登 录</button>
+                    </div>
+
+                    <div class="ui error mini message"></div>
+                    <div class="ui mini negative message" th:unless="${#strings.isEmpty(message)}" th:text="${message}">
+                        登录密码错误
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+
+
+<script>
+    $('.ui.form').form({
+        fields: {
+            userName: {
+                identifier: 'userName',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入用户名'
+                }]
+            },
+            password: {
+                identifier: 'password',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入密码'
+                }]
+            }
+        }
+    });
+    // 检查用户名是否重复
+    function checkRepetitive() {
+        var userName = $('#userName').val();
+        $.ajax({
+            url: "/user/checkUserIsRepeat?userName=" + userName,
+            type: "GET",
+            success: function (res) {
+                if (!res) {
+                    alert("用户名不存在，请先去注册~");
+                }
+            }
+        })
+    }
+    // 忘记密码
+    function toForgetPsw() {
+        console.log("1111111111111")
+    }
+
+</script>
+
+</body>
+</html>

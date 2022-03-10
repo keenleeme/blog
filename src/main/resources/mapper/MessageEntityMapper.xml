@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.monster.blog.mapper.MessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.monster.blog.domain.MessageEntity">
+        <id column="ID" property="id" />
+        <result column="NICK_NAME" property="nickName" />
+        <result column="CONTENT" property="content" />
+        <result column="AVATAR" property="avatar" />
+        <result column="PARENT_MESSAGE_ID" property="parentMessageId" />
+        <result column="PARENT_NICK_NAME" property="parentNickName" />
+        <result column="PARENT_USER_ID" property="parentUserId" />
+        <result column="ADMIN_MESSAGE" property="adminMessage" />
+        <result column="IS_REMOVED" property="isRemoved" />
+        <result column="CREATED_TIME" property="createdTime" />
+        <result column="CREATED_BY" property="createdBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, NICK_NAME, CONTENT, AVATAR, PARENT_MESSAGE_ID, PARENT_NICK_NAME, PARENT_USER_ID, ADMIN_MESSAGE, IS_REMOVED, CREATED_TIME, CREATED_BY
+    </sql>
+
+</mapper>
